@@ -105,7 +105,7 @@ const InputList: React.FC<InputListProps> = ({
 
   return (
     <motion.div
-      className="w-[100%] h-[80vh] bg-slate-50 absolute top-full left-0 overflow-y-auto"
+      className="w-[100%] h-[80vh] bg-slate-50/90 absolute top-full left-0 overflow-y-auto z-10"
       initial={{ opacity: 0, y: -30 }}
       animate={{ opacity: 1, y: -20 }}
       exit={{ opacity: 0, y: -25 }}

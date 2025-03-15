@@ -5,17 +5,35 @@ export const CardContainer: React.FC<Props> = ({
   selectedPokemons,
   setSelectedPokemons,
 }) => {
-  setSelectedPokemons(selectedPokemons); //
   return (
-    <div className=" flex justify-center flex-wrap items-center w-[100%] h-[100%]">
-      {selectedPokemons.map((pokemon, index) => (
-        <Card pokemon={pokemon} index={index} key={index} />
-      ))}
+    <div className="flex justify-center flex-wrap items-center w-[100%] h-[100%]">
+      {selectedPokemons.length ? (
+        selectedPokemons.map((pokemon, index) => (
+          <Card
+            pokemon={pokemon}
+            index={index}
+            key={index}
+            selectedPokemons={selectedPokemons}
+            setSelectedPokemons={setSelectedPokemons}
+          />
+        ))
+      ) : (
+        <div className="flex items-center justify-center w-full h-[70vh]">
+          <span className="text-sky-500 opacity-20 text-5xl">
+            Список покемонов пока пуст
+          </span>
+        </div>
+      )}
     </div>
   );
 };
 
-const Card: FC<CardProps> = ({ pokemon, index }) => {
+const Card: FC<CardProps> = ({
+  pokemon,
+  index,
+  selectedPokemons,
+  setSelectedPokemons,
+}) => {
   const [pokemonInfo, setPokemonInfo] = useState<PokemonInfo | null>(null);
   const [pokemonForms, setPokemonForms] = useState<PokemonForms | null>(null);
   const [loading, setLoading] = useState(true);
@@ -44,7 +62,7 @@ const Card: FC<CardProps> = ({ pokemon, index }) => {
   return (
     <div
       key={index}
-      className=" w-[20vw] h-[20vw] bg-slate-300 m-[1vw] rounded-xl flex items-center justify-evenly flex-col"
+      className="relative w-[20vw] h-[20vw] bg-slate-300 m-[1vw] rounded-xl flex items-center justify-evenly flex-col overflow-hidden group"
     >
       <span className=" text-cyan-700 text-3xl">{pokemon.name}</span>
       {loading ? (
@@ -75,7 +93,6 @@ const Card: FC<CardProps> = ({ pokemon, index }) => {
                     ).length
                   }
                 </span>
-                {/* [_,value] */}
               </>
             ) : (
               <span>No data</span>
@@ -85,6 +102,18 @@ const Card: FC<CardProps> = ({ pokemon, index }) => {
       ) : (
         <span>No data</span>
       )}
+      <div className="absolute inset-0 bg-black bg-opacity-0 backdrop-blur-0 flex items-center justify-center transition-all duration-300 group-hover:bg-opacity-50 group-hover:backdrop-blur-sm">
+        <button
+          onClick={() =>
+            setSelectedPokemons(
+              selectedPokemons.filter((el) => el.name !== pokemon.name),
+            )
+          }
+          className="text-red-500 text-6xl opacity-0 transition-all duration-300 group-hover:opacity-100"
+        >
+          ✕
+        </button>
+      </div>
     </div>
   );
 };
