@@ -1,31 +1,17 @@
 import { FC, useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Pokemon,
+  CardPropsHesder,
+  PokemonInfo,
+  Props,
+  InputListProps,
+} from "../types";
 
-type Pokemon = {
-  name: string;
-  url: string;
-};
-
-type CardProps = {
-  pokemon: Pokemon;
-  index: number;
-};
-
-type PokemonInfo = {
-  sprites: {
-    front_default: string;
-  };
-};
-
-type InputListProps = {
-  pokemons: Pokemon[];
-  setPokemons: (pokemons: Pokemon[]) => void;
-  pageNumber: number;
-  setPageNumber: (pageNumber: number) => void;
-  value: string;
-};
-
-export const Header: React.FC = () => {
+export const Header: React.FC<Props> = ({
+  selectedPokemons,
+  setSelectedPokemons,
+}) => {
   const [value, setValue] = useState("");
   const [click, setClick] = useState(false);
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
@@ -71,6 +57,8 @@ export const Header: React.FC = () => {
               pageNumber={pageNumber}
               setPageNumber={setPageNumber}
               value={value}
+              setSelectedPokemons={setSelectedPokemons}
+              selectedPokemons={selectedPokemons}
             />
           )}
         </AnimatePresence>
@@ -85,6 +73,8 @@ const InputList: React.FC<InputListProps> = ({
   pageNumber,
   setPageNumber,
   value,
+  setSelectedPokemons,
+  selectedPokemons,
 }) => {
   const [loading, setLoading] = useState(true);
 
@@ -129,7 +119,13 @@ const InputList: React.FC<InputListProps> = ({
             </span>
           ) : filteredPokemons.length ? (
             filteredPokemons.map((pokemon, index) => (
-              <CardInput pokemon={pokemon} index={index} key={pokemon.name} />
+              <CardInput
+                pokemon={pokemon}
+                index={index}
+                setSelectedPokemons={setSelectedPokemons}
+                selectedPokemons={selectedPokemons}
+                key={pokemon.name}
+              />
             ))
           ) : (
             <span className="flex items-center justify-center h-[70vh] w-[100vw] text-sky-500 opacity-20 text-5xl">
@@ -145,7 +141,9 @@ const InputList: React.FC<InputListProps> = ({
               boxShadow: "0 0 10px 2px rgba(34, 211, 238, 0.5)",
             }}
             transition={{ type: "spring", stiffness: 300 }}
-            onClick={() => setPageNumber(pageNumber + 20)}
+            onClick={() => {
+              setPageNumber(pageNumber + 20);
+            }}
           >
             Show more
           </motion.button>
@@ -155,7 +153,12 @@ const InputList: React.FC<InputListProps> = ({
   );
 };
 
-const CardInput: FC<CardProps> = ({ pokemon, index }) => {
+const CardInput: FC<CardPropsHesder> = ({
+  pokemon,
+  index,
+  setSelectedPokemons,
+  selectedPokemons,
+}) => {
   const [pokemonInfo, setPokemonInfo] = useState<PokemonInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const pokemonId = pokemon.url.split("/")[6];
@@ -174,12 +177,23 @@ const CardInput: FC<CardProps> = ({ pokemon, index }) => {
     };
 
     fetchPokemonInfo();
-  }, [index]);
+  }, [pokemonId]);
+
+  const handleAddPokemon = () => {
+    const isPokemonSelected = selectedPokemons.some(
+      (selectedPokemon) => selectedPokemon.name === pokemon.name,
+    );
+
+    if (!isPokemonSelected) {
+      setSelectedPokemons([...selectedPokemons, pokemon]);
+    }
+  };
 
   return (
     <button
       key={index}
       className="w-[8vw] h-[8vw] bg-slate-300 m-[2vw] rounded-xl flex items-center justify-evenly flex-col"
+      onClick={handleAddPokemon}
     >
       <span className="text-cyan-700">{pokemon.name}</span>
       {loading ? (

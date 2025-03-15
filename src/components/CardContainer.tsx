@@ -1,81 +1,34 @@
 import { FC, useEffect, useState } from "react";
+import { Props, CardProps, PokemonInfo, PokemonForms } from "../types";
 
-type Pokemon = {
-  name: string;
-  url: string;
-};
-
-type CardProps = {
-  pokemon: Pokemon;
-  index: number;
-};
-
-export const CardContainer: React.FC = () => {
-  const [pokemons, setPokemons] = useState<Pokemon[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchPokemons = async () => {
-      try {
-        const response = await fetch("https://pokeapi.co/api/v2/pokemon");
-        const data = await response.json();
-        setPokemons(data.results);
-        setLoading(false);
-      } catch (error) {
-        console.error("Ошибка при загрузке данных:", error);
-      }
-    };
-
-    fetchPokemons();
-  }, []);
-
+export const CardContainer: React.FC<Props> = ({
+  selectedPokemons,
+  setSelectedPokemons,
+}) => {
+  setSelectedPokemons(selectedPokemons); //
   return (
     <div className=" flex justify-center flex-wrap items-center w-[100%] h-[100%]">
-      {loading ? (
-        <span className=" flex items-center justify-center h-[60vh] text-sky-500 opacity-20 text-8xl">
-          Loading...
-        </span>
-      ) : (
-        pokemons.map((pokemon, index) => (
-          <Card pokemon={pokemon} index={index} key={index} />
-        ))
-      )}
+      {selectedPokemons.map((pokemon, index) => (
+        <Card pokemon={pokemon} index={index} key={index} />
+      ))}
     </div>
   );
-};
-
-type PokemonInfo = {
-  sprites: {
-    front_default: string;
-  };
-};
-
-type PokemonForms = {
-  sprites: {
-    back_default: string;
-    back_female: string | null;
-    back_shiny: string;
-    back_shiny_female: string | null;
-    front_default: string;
-    front_female: string | null;
-    front_shiny: string;
-    front_shiny_female: string | null;
-  };
 };
 
 const Card: FC<CardProps> = ({ pokemon, index }) => {
   const [pokemonInfo, setPokemonInfo] = useState<PokemonInfo | null>(null);
   const [pokemonForms, setPokemonForms] = useState<PokemonForms | null>(null);
   const [loading, setLoading] = useState(true);
+  const pokemonId = pokemon.url.split("/")[6];
 
   useEffect(() => {
     const fetchPokemonInfo = async () => {
       try {
         const dataInfo = await fetch(
-          `https://pokeapi.co/api/v2/pokemon/${index + 1}/`,
+          `https://pokeapi.co/api/v2/pokemon/${pokemonId}/`,
         ).then((response) => response.json());
         const dataForms = await fetch(
-          `https://pokeapi.co/api/v2/pokemon-form/${index + 1}/`,
+          `https://pokeapi.co/api/v2/pokemon-form/${pokemonId}/`,
         ).then((response) => response.json());
         setPokemonForms(dataForms);
         setPokemonInfo(dataInfo);
