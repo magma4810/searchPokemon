@@ -99,8 +99,8 @@ const Card: FC<CardProps> = ({ pokemon, index, deletePokemons }) => {
                 <span>
                   Forms count:{" "}
                   {
-                    Object.entries(pokemonForms.sprites).filter(
-                      ([value]) => value,
+                    Object.values(pokemonForms.sprites).filter(
+                      (value) => value !== null && value !== undefined,
                     ).length
                   }
                 </span>
