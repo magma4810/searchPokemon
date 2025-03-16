@@ -27,7 +27,11 @@ export const CardContainer: React.FC = () => {
     >
       {selectedPokemons.length ? (
         selectedPokemons.map((pokemon) => (
-          <CardHeader pokemon={pokemon} deletePokemons={deletePokemons} />
+          <CardHeader
+            key={pokemon.name}
+            pokemon={pokemon}
+            deletePokemons={deletePokemons}
+          />
         ))
       ) : (
         <div className="flex items-center justify-center w-full h-[70vh]">

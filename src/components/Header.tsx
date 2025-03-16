@@ -84,7 +84,7 @@ const InputList: React.FC = memo(() => {
           );
           const data = await response.json();
           if (pageNumber === 0) {
-            dispatch(changePokemons(pokemonsLocalStorage));
+            dispatch(changePokemons(data.results));
           } else {
             const updatedPokemons = [...pokemons, ...data.results];
             dispatch(changePokemons(updatedPokemons));
