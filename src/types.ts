@@ -5,14 +5,11 @@ export type Pokemon = {
 
 export type CardProps = {
   pokemon: Pokemon;
-  index: string;
   deletePokemons: (pokemon: Pokemon) => void;
 };
 
 export type CardPropsHesder = {
   pokemon: Pokemon;
-  selectedPokemons: Pokemon[];
-  setSelectedPokemons: (pokemons: Pokemon[]) => void;
 };
 
 export type Props = {
@@ -27,13 +24,9 @@ export type PokemonInfo = {
 };
 
 export type InputListProps = {
-  pokemons: Pokemon[];
-  setPokemons: (pokemons: Pokemon[]) => void;
   pageNumber: number;
   setPageNumber: (pageNumber: number) => void;
   value: string;
-  setSelectedPokemons: (pokemons: Pokemon[]) => void;
-  selectedPokemons: Pokemon[];
 };
 
 export type PokemonForms = {

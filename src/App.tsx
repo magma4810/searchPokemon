@@ -1,25 +1,19 @@
 import "./App.css";
 import { CardContainer } from "./components/CardContainer";
 import { Header } from "./components/Header";
-import { useState } from "react";
-import { Pokemon } from "./types";
 import { ThemeProvider } from "./components/ThemeProvider";
+import { Provider } from "react-redux";
+import { store } from "./store";
 
 function App() {
-  const [selectedPokemons, setSelectedPokemons] = useState<Pokemon[]>([]);
-
   return (
     <>
-      <ThemeProvider>
-        <Header
-          selectedPokemons={selectedPokemons}
-          setSelectedPokemons={setSelectedPokemons}
-        />
-        <CardContainer
-          selectedPokemons={selectedPokemons}
-          setSelectedPokemons={setSelectedPokemons}
-        />
-      </ThemeProvider>
+      <Provider store={store}>
+        <ThemeProvider>
+          <Header />
+          <CardContainer />
+        </ThemeProvider>
+      </Provider>
     </>
   );
 }

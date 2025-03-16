@@ -1,15 +1,21 @@
 import { FC, useCallback, useEffect, useState } from "react";
-import { Props, CardProps, PokemonInfo, PokemonForms, Pokemon } from "../types";
+import { CardProps, PokemonInfo, PokemonForms, Pokemon } from "../types";
 import { useTheme } from "./hooks/useTheme";
+import { useDispatch, useSelector } from "react-redux";
+import { StoreApp } from "../store";
+import { addSelectedPokemons } from "../store/pokemon.slice";
 
-export const CardContainer: React.FC<Props> = ({
-  selectedPokemons,
-  setSelectedPokemons,
-}) => {
+export const CardContainer: React.FC = () => {
+  const selectedPokemons = useSelector(
+    (store: StoreApp) => store.pokemon.selectedPokemons,
+  );
+  const dispatch = useDispatch();
   const deletePokemons = useCallback(
     (pokemon: Pokemon) => {
-      setSelectedPokemons(
-        selectedPokemons.filter((el) => el.name !== pokemon.name),
+      dispatch(
+        addSelectedPokemons(
+          selectedPokemons.filter((el) => el.name !== pokemon.name),
+        ),
       );
     },
     [selectedPokemons],
@@ -21,12 +27,7 @@ export const CardContainer: React.FC<Props> = ({
     >
       {selectedPokemons.length ? (
         selectedPokemons.map((pokemon) => (
-          <Card
-            pokemon={pokemon}
-            index={pokemon.name}
-            key={pokemon.name}
-            deletePokemons={deletePokemons}
-          />
+          <CardHeader pokemon={pokemon} deletePokemons={deletePokemons} />
         ))
       ) : (
         <div className="flex items-center justify-center w-full h-[70vh]">
@@ -39,7 +40,7 @@ export const CardContainer: React.FC<Props> = ({
   );
 };
 
-const Card: FC<CardProps> = ({ pokemon, index, deletePokemons }) => {
+const CardHeader: FC<CardProps> = ({ pokemon, deletePokemons }) => {
   const [pokemonInfo, setPokemonInfo] = useState<PokemonInfo | null>(null);
   const [pokemonForms, setPokemonForms] = useState<PokemonForms | null>(null);
   const [loading, setLoading] = useState(true);
@@ -64,11 +65,11 @@ const Card: FC<CardProps> = ({ pokemon, index, deletePokemons }) => {
     };
 
     fetchPokemonInfo();
-  }, [index]);
+  }, []);
 
   return (
     <div
-      key={index}
+      key={pokemon.name}
       className={`relative w-[20vw] h-[20vw] m-[1vw] rounded-xl flex items-center justify-evenly flex-col overflow-hidden group ${isLight ? " bg-slate-300 " : " bg-cyan-700"}`}
     >
       <span

@@ -1,10 +1,8 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import { profileReducer } from "./profile.slice";
-import { messagesReducer } from "./messages.slice";
+import { pokemonReducer } from "./pokemon.slice";
 
 const rootReducer = combineReducers({
-  profile: profileReducer,
-  messages: messagesReducer,
+  pokemon: pokemonReducer,
 });
 
 export const store = configureStore({
