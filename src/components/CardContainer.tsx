@@ -1,24 +1,30 @@
 import { FC, useCallback, useEffect, useState } from "react";
-import { Props, CardProps, PokemonInfo, PokemonForms } from "../types";
+import { Props, CardProps, PokemonInfo, PokemonForms, Pokemon } from "../types";
+import { useTheme } from "./hooks/useTheme";
 
 export const CardContainer: React.FC<Props> = ({
   selectedPokemons,
   setSelectedPokemons,
 }) => {
   const deletePokemons = useCallback(
-    (pokemon: string) => {
-      setSelectedPokemons(selectedPokemons.filter((el) => el.name !== pokemon));
+    (pokemon: Pokemon) => {
+      setSelectedPokemons(
+        selectedPokemons.filter((el) => el.name !== pokemon.name),
+      );
     },
     [selectedPokemons],
   );
+  const { isLight } = useTheme();
   return (
-    <div className="flex justify-center flex-wrap items-center w-[100%] h-[100%]">
+    <div
+      className={`flex overflow-y-auto justify-center flex-wrap items-center h-[85vh] w-[100%] ${isLight ? " bg-slate-100 " : " bg-slate-300"}`}
+    >
       {selectedPokemons.length ? (
-        selectedPokemons.map((pokemon, index) => (
+        selectedPokemons.map((pokemon) => (
           <Card
             pokemon={pokemon}
-            index={index}
-            key={index}
+            index={pokemon.name}
+            key={pokemon.name}
             deletePokemons={deletePokemons}
           />
         ))
@@ -38,6 +44,7 @@ const Card: FC<CardProps> = ({ pokemon, index, deletePokemons }) => {
   const [pokemonForms, setPokemonForms] = useState<PokemonForms | null>(null);
   const [loading, setLoading] = useState(true);
   const pokemonId = pokemon.url.split("/")[6];
+  const { isLight } = useTheme();
 
   useEffect(() => {
     const fetchPokemonInfo = async () => {
@@ -62,9 +69,13 @@ const Card: FC<CardProps> = ({ pokemon, index, deletePokemons }) => {
   return (
     <div
       key={index}
-      className="relative w-[20vw] h-[20vw] bg-slate-300 m-[1vw] rounded-xl flex items-center justify-evenly flex-col overflow-hidden group"
+      className={`relative w-[20vw] h-[20vw] m-[1vw] rounded-xl flex items-center justify-evenly flex-col overflow-hidden group ${isLight ? " bg-slate-300 " : " bg-cyan-700"}`}
     >
-      <span className=" text-cyan-700 text-3xl">{pokemon.name}</span>
+      <span
+        className={`text-3xl ${isLight ? " text-cyan-700 " : " text-slate-300"}`}
+      >
+        {pokemon.name}
+      </span>
       {loading ? (
         <span>Loading...</span>
       ) : pokemonInfo ? (
@@ -104,7 +115,7 @@ const Card: FC<CardProps> = ({ pokemon, index, deletePokemons }) => {
       )}
       <div className="absolute inset-0 bg-black bg-opacity-0 backdrop-blur-0 flex items-center justify-center transition-all duration-300 group-hover:bg-opacity-50 group-hover:backdrop-blur-sm">
         <button
-          onClick={() => deletePokemons(pokemon.name)}
+          onClick={() => deletePokemons(pokemon)}
           className="text-red-500 text-6xl opacity-0 transition-all duration-300 group-hover:opacity-100"
         >
           ✕

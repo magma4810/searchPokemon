@@ -7,6 +7,7 @@ import {
   Props,
   InputListProps,
 } from "../types";
+import { useTheme } from "./hooks/useTheme";
 
 export const Header: React.FC<Props> = ({
   selectedPokemons,
@@ -17,6 +18,7 @@ export const Header: React.FC<Props> = ({
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
   const [pageNumber, setPageNumber] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { isLight, toggleTheme } = useTheme();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -36,7 +38,9 @@ export const Header: React.FC<Props> = ({
   }, []);
 
   return (
-    <header className="flex justify-center items-center w-full h-[20vh] bg-red-900">
+    <header
+      className={`flex justify-center items-center w-full h-[15vh] bg-red-900 ${isLight ? "bg-red-900" : "bg-gray-900"}`}
+    >
       <div
         className="w-[60%] h-[50%] flex items-center justify-center relative"
         ref={inputRef}
@@ -47,7 +51,7 @@ export const Header: React.FC<Props> = ({
           onChange={(ev) => setValue(ev.target.value)}
           placeholder="Начните вводить имя покемона"
           type="text"
-          className="pl-[1vw] w-[100%] h-[50%]"
+          className="pl-[1vw] w-[100%] h-[70%]"
         />
         <AnimatePresence>
           {click && (
@@ -63,6 +67,12 @@ export const Header: React.FC<Props> = ({
           )}
         </AnimatePresence>
       </div>
+      <button
+        onClick={toggleTheme}
+        className="ml-4 p-2 bg-blue-500 text-white rounded"
+      >
+        {isLight ? "Темная тема" : "Светлая тема"}
+      </button>
     </header>
   );
 };
@@ -98,12 +108,12 @@ const InputList: React.FC<InputListProps> = memo(
 
       fetchPokemons();
     }, [pageNumber]);
-
+    const memoizedPokemons = useMemo(() => pokemons, [pokemons]);
     const filteredPokemons = useMemo(() => {
-      return pokemons.filter((pokemon) =>
+      return memoizedPokemons.filter((pokemon) =>
         pokemon.name.toLowerCase().includes(value.toLowerCase()),
       );
-    }, [value, pokemons]);
+    }, [value, memoizedPokemons]);
 
     return (
       <motion.div
@@ -120,10 +130,9 @@ const InputList: React.FC<InputListProps> = memo(
                 Loading...
               </span>
             ) : filteredPokemons.length ? (
-              filteredPokemons.map((pokemon, index) => (
+              filteredPokemons.map((pokemon) => (
                 <CardInput
                   pokemon={pokemon}
-                  index={index}
                   setSelectedPokemons={setSelectedPokemons}
                   selectedPokemons={selectedPokemons}
                   key={pokemon.name}
@@ -158,7 +167,6 @@ const InputList: React.FC<InputListProps> = memo(
 
 const CardInput: FC<CardPropsHesder> = ({
   pokemon,
-  index,
   setSelectedPokemons,
   selectedPokemons,
 }) => {
@@ -194,7 +202,7 @@ const CardInput: FC<CardPropsHesder> = ({
 
   return (
     <button
-      key={index}
+      key={pokemon.name}
       className="w-[8vw] h-[8vw] bg-slate-300 m-[2vw] rounded-xl flex items-center justify-evenly flex-col"
       onClick={handleAddPokemon}
     >

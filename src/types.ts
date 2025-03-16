@@ -5,13 +5,12 @@ export type Pokemon = {
 
 export type CardProps = {
   pokemon: Pokemon;
-  index: number;
-  deletePokemons: (pokemon: string) => void;
+  index: string;
+  deletePokemons: (pokemon: Pokemon) => void;
 };
 
 export type CardPropsHesder = {
   pokemon: Pokemon;
-  index: number;
   selectedPokemons: Pokemon[];
   setSelectedPokemons: (pokemons: Pokemon[]) => void;
 };
