@@ -89,25 +89,35 @@ const InputList: React.FC<InputListProps> = memo(
   }) => {
     const [loading, setLoading] = useState(true);
     useEffect(() => {
-      const fetchPokemons = async () => {
-        try {
-          const response = await fetch(
-            `https://pokeapi.co/api/v2/pokemon?offset=${pageNumber}&limit=20`,
-          );
-          const data = await response.json();
-          if (pageNumber === 0) {
-            setPokemons(data.results);
-          } else {
-            setPokemons([...pokemons, ...data.results]);
+      const pokemonsLocalStorage: Pokemon[] = localStorage["pokemons"]
+        ? JSON.parse(localStorage["pokemons"]).results
+        : null;
+      if (pokemonsLocalStorage && loading) {
+        setLoading(false);
+        setPokemons(pokemonsLocalStorage);
+      } else {
+        const fetchPokemons = async () => {
+          try {
+            const response = await fetch(
+              `https://pokeapi.co/api/v2/pokemon?offset=${pageNumber}&limit=20`,
+            );
+            const data = await response.json();
+            if (pageNumber === 0) {
+              setPokemons(data.results);
+            } else {
+              setPokemons([...pokemons, ...data.results]);
+            }
+            if (loading) {
+              localStorage.setItem("pokemons", JSON.stringify(data));
+            }
+            setLoading(false);
+          } catch (error) {
+            console.error("Ошибка при загрузке данных:", error);
           }
-          setLoading(false);
-        } catch (error) {
-          console.error("Ошибка при загрузке данных:", error);
-        }
-      };
-
-      fetchPokemons();
-    }, [pageNumber]);
+        };
+        fetchPokemons();
+      }
+    }, [pageNumber, loading, pokemons, setPokemons]);
     const memoizedPokemons = useMemo(() => pokemons, [pokemons]);
     const filteredPokemons = useMemo(() => {
       return memoizedPokemons.filter((pokemon) =>
@@ -119,7 +129,7 @@ const InputList: React.FC<InputListProps> = memo(
       <motion.div
         className="w-[100%] h-[80vh] bg-slate-50/90 absolute top-full left-0 overflow-y-auto z-10"
         initial={{ opacity: 0, y: -30 }}
-        animate={{ opacity: 1, y: -20 }}
+        animate={{ opacity: 1, y: -10 }}
         exit={{ opacity: 0, y: -25 }}
         transition={{ duration: 0.5 }}
       >
