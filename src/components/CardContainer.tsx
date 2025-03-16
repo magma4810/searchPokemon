@@ -1,10 +1,16 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { Props, CardProps, PokemonInfo, PokemonForms } from "../types";
 
 export const CardContainer: React.FC<Props> = ({
   selectedPokemons,
   setSelectedPokemons,
 }) => {
+  const deletePokemons = useCallback(
+    (pokemon: string) => {
+      setSelectedPokemons(selectedPokemons.filter((el) => el.name !== pokemon));
+    },
+    [selectedPokemons],
+  );
   return (
     <div className="flex justify-center flex-wrap items-center w-[100%] h-[100%]">
       {selectedPokemons.length ? (
@@ -13,8 +19,7 @@ export const CardContainer: React.FC<Props> = ({
             pokemon={pokemon}
             index={index}
             key={index}
-            selectedPokemons={selectedPokemons}
-            setSelectedPokemons={setSelectedPokemons}
+            deletePokemons={deletePokemons}
           />
         ))
       ) : (
@@ -28,12 +33,7 @@ export const CardContainer: React.FC<Props> = ({
   );
 };
 
-const Card: FC<CardProps> = ({
-  pokemon,
-  index,
-  selectedPokemons,
-  setSelectedPokemons,
-}) => {
+const Card: FC<CardProps> = ({ pokemon, index, deletePokemons }) => {
   const [pokemonInfo, setPokemonInfo] = useState<PokemonInfo | null>(null);
   const [pokemonForms, setPokemonForms] = useState<PokemonForms | null>(null);
   const [loading, setLoading] = useState(true);
@@ -104,11 +104,7 @@ const Card: FC<CardProps> = ({
       )}
       <div className="absolute inset-0 bg-black bg-opacity-0 backdrop-blur-0 flex items-center justify-center transition-all duration-300 group-hover:bg-opacity-50 group-hover:backdrop-blur-sm">
         <button
-          onClick={() =>
-            setSelectedPokemons(
-              selectedPokemons.filter((el) => el.name !== pokemon.name),
-            )
-          }
+          onClick={() => deletePokemons(pokemon.name)}
           className="text-red-500 text-6xl opacity-0 transition-all duration-300 group-hover:opacity-100"
         >
           ✕

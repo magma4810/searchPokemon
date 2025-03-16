@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, useRef } from "react";
+import { FC, useEffect, useState, useRef, memo, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Pokemon,
@@ -67,91 +67,94 @@ export const Header: React.FC<Props> = ({
   );
 };
 
-const InputList: React.FC<InputListProps> = ({
-  pokemons,
-  setPokemons,
-  pageNumber,
-  setPageNumber,
-  value,
-  setSelectedPokemons,
-  selectedPokemons,
-}) => {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchPokemons = async () => {
-      try {
-        const response = await fetch(
-          `https://pokeapi.co/api/v2/pokemon?offset=${pageNumber}&limit=20`,
-        );
-        const data = await response.json();
-        if (pageNumber === 0) {
-          setPokemons(data.results);
-        } else {
-          setPokemons([...pokemons, ...data.results]);
+const InputList: React.FC<InputListProps> = memo(
+  ({
+    pokemons,
+    setPokemons,
+    pageNumber,
+    setPageNumber,
+    value,
+    setSelectedPokemons,
+    selectedPokemons,
+  }) => {
+    const [loading, setLoading] = useState(true);
+    useEffect(() => {
+      const fetchPokemons = async () => {
+        try {
+          const response = await fetch(
+            `https://pokeapi.co/api/v2/pokemon?offset=${pageNumber}&limit=20`,
+          );
+          const data = await response.json();
+          if (pageNumber === 0) {
+            setPokemons(data.results);
+          } else {
+            setPokemons([...pokemons, ...data.results]);
+          }
+          setLoading(false);
+        } catch (error) {
+          console.error("Ошибка при загрузке данных:", error);
         }
-        setLoading(false);
-      } catch (error) {
-        console.error("Ошибка при загрузке данных:", error);
-      }
-    };
+      };
 
-    fetchPokemons();
-  }, [pageNumber, setPokemons]);
+      fetchPokemons();
+    }, [pageNumber]);
 
-  const filteredPokemons = pokemons.filter((pokemon) =>
-    pokemon.name.toLowerCase().includes(value.toLowerCase()),
-  );
+    const filteredPokemons = useMemo(() => {
+      return pokemons.filter((pokemon) =>
+        pokemon.name.toLowerCase().includes(value.toLowerCase()),
+      );
+    }, [value, pokemons]);
 
-  return (
-    <motion.div
-      className="w-[100%] h-[80vh] bg-slate-50/90 absolute top-full left-0 overflow-y-auto z-10"
-      initial={{ opacity: 0, y: -30 }}
-      animate={{ opacity: 1, y: -20 }}
-      exit={{ opacity: 0, y: -25 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className=" flex flex-col justify-center items-center w-[100%] ">
-        <div className="flex flex-wrap w-[100%] h-[100%] ">
-          {loading ? (
-            <span className="flex items-center justify-center h-[60vh] text-sky-500 opacity-20 text-8xl">
-              Loading...
-            </span>
-          ) : filteredPokemons.length ? (
-            filteredPokemons.map((pokemon, index) => (
-              <CardInput
-                pokemon={pokemon}
-                index={index}
-                setSelectedPokemons={setSelectedPokemons}
-                selectedPokemons={selectedPokemons}
-                key={pokemon.name}
-              />
-            ))
-          ) : (
-            <span className="flex items-center justify-center h-[70vh] w-[100vw] text-sky-500 opacity-20 text-5xl">
-              Такой покемон не найден
-            </span>
-          )}
+    return (
+      <motion.div
+        className="w-[100%] h-[80vh] bg-slate-50/90 absolute top-full left-0 overflow-y-auto z-10"
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: -20 }}
+        exit={{ opacity: 0, y: -25 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className=" flex flex-col justify-center items-center w-[100%] ">
+          <div className="flex flex-wrap w-[100%] h-[100%] ">
+            {loading ? (
+              <span className="flex items-center justify-center h-[60vh] w-[100%] text-sky-500 opacity-20 text-8xl">
+                Loading...
+              </span>
+            ) : filteredPokemons.length ? (
+              filteredPokemons.map((pokemon, index) => (
+                <CardInput
+                  pokemon={pokemon}
+                  index={index}
+                  setSelectedPokemons={setSelectedPokemons}
+                  selectedPokemons={selectedPokemons}
+                  key={pokemon.name}
+                />
+              ))
+            ) : (
+              <span className="flex items-center justify-center h-[70vh] w-[100vw] text-sky-500 opacity-20 text-5xl">
+                Такой покемон не найден
+              </span>
+            )}
+          </div>
+          <div className="w-[7vw] pb-5">
+            <motion.button
+              className="text-sky-500 p-[0.5vw] border-2 border-cyan-400 rounded-lg"
+              whileHover={{
+                scale: 1.05,
+                boxShadow: "0 0 10px 2px rgba(34, 211, 238, 0.5)",
+              }}
+              transition={{ type: "spring", stiffness: 300 }}
+              onClick={() => {
+                setPageNumber(pageNumber + 20);
+              }}
+            >
+              Show more
+            </motion.button>
+          </div>
         </div>
-        <div className="w-[7vw] pb-5">
-          <motion.button
-            className="text-sky-500 p-[0.5vw] border-2 border-cyan-400 rounded-lg"
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 0 10px 2px rgba(34, 211, 238, 0.5)",
-            }}
-            transition={{ type: "spring", stiffness: 300 }}
-            onClick={() => {
-              setPageNumber(pageNumber + 20);
-            }}
-          >
-            Show more
-          </motion.button>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
+      </motion.div>
+    );
+  },
+);
 
 const CardInput: FC<CardPropsHesder> = ({
   pokemon,

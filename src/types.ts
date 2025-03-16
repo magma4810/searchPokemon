@@ -6,8 +6,7 @@ export type Pokemon = {
 export type CardProps = {
   pokemon: Pokemon;
   index: number;
-  selectedPokemons: Pokemon[];
-  setSelectedPokemons: (pokemons: Pokemon[]) => void;
+  deletePokemons: (pokemon: string) => void;
 };
 
 export type CardPropsHesder = {
