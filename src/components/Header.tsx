@@ -117,7 +117,7 @@ const InputList: React.FC<InputListProps> = memo(
         };
         fetchPokemons();
       }
-    }, [pageNumber, loading, pokemons, setPokemons]);
+    }, [pageNumber]);
     const memoizedPokemons = useMemo(() => pokemons, [pokemons]);
     const filteredPokemons = useMemo(() => {
       return memoizedPokemons.filter((pokemon) =>
